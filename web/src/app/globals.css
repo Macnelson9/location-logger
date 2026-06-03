@@ -1,0 +1,91 @@
+:root {
+  /* Warm Linen — light (matches Pencil tokens) */
+  --bg: #f3ebe2;
+  --surface: #ffffff;
+  --surface-alt: #efe5d9;
+  --field-bg: #ffffff;
+  --border: #c5beb6;
+  --text: #1a1a1a;
+  --text-2: #3d3d3d;
+  --text-muted: #8a8276;
+  --accent: #c0653c;
+  --accent-soft: #eadbcd;
+  --on-accent: #ffffff;
+  --success: #4f7a5b;
+  --danger: #b5442e;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06), 0 12px 28px rgba(0, 0, 0, 0.1);
+  --shadow-card-lg: 0 2px 8px rgba(0, 0, 0, 0.06), 0 14px 32px rgba(0, 0, 0, 0.1);
+
+  --font-head: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg: #201c18;
+  --surface: #2a2521;
+  --surface-alt: #322c27;
+  --field-bg: #1a1714;
+  --border: #473f37;
+  --text: #f4eee6;
+  --text-2: #c9c1b7;
+  --text-muted: #97907f;
+  --accent: #d17a52;
+  --accent-soft: #3a2e26;
+  --success: #6fa37c;
+  --danger: #e0664e;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-btn: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.5);
+  --shadow-card-lg: 0 2px 8px rgba(0, 0, 0, 0.35), 0 14px 32px rgba(0, 0, 0, 0.55);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Crisp pixel-art scaling */
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}

@@ -1,0 +1,45 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  box-shadow: var(--shadow-btn);
+}
+
+/* Compact variant used inside the app top bar */
+.compact {
+  padding: 3px;
+  background: var(--surface-alt);
+  border: none;
+  box-shadow: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 34px;
+  border-radius: 100px;
+  color: var(--text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.compact .btn {
+  width: 34px;
+  height: 30px;
+}
+
+.btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.compact .btn.active {
+  background: var(--surface);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}

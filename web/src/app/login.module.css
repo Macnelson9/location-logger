@@ -1,0 +1,155 @@
+.screen {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.toggleWrap {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+}
+
+.card {
+  display: flex;
+  align-items: stretch;
+  width: 940px;
+  max-width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card-lg);
+  overflow: hidden;
+}
+
+.formSide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 48px 48px 44px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.title {
+  font-family: var(--font-head);
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.footMuted {
+  color: var(--text-muted);
+}
+
+.footLink {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.accentSide {
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 44px;
+  background: var(--accent-soft);
+}
+
+.plantWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.plantCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 220px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.plantImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.quote {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  text-align: center;
+}
+
+.quoteText {
+  font-family: var(--font-head);
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.quoteSub {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+@media (max-width: 860px) {
+  .card {
+    flex-direction: column;
+    width: 440px;
+  }
+  .accentSide {
+    width: 100%;
+  }
+  .toggleWrap {
+    top: 20px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .screen {
+    padding: 20px;
+  }
+  .formSide {
+    padding: 32px 28px 28px;
+  }
+}
