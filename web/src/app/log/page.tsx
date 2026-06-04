@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { LocateFixed, Check } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
 import { Button } from "@/components/Button";
@@ -8,68 +9,116 @@ import { TextField } from "@/components/TextField";
 import { Dropdown } from "@/components/Dropdown";
 import { CoordChip } from "@/components/CoordChip";
 import { RecentRow } from "@/components/RecentRow";
-import { BUILDING_TYPES, type BuildingType } from "@/lib/buildingTypes";
-import { SAMPLE_RECENT, type LoggedLocation } from "@/lib/recent";
+import { LocationModal } from "@/components/LocationModal";
+import { createLocation, getCategories, getLocations, getMe } from "@/lib/api";
+import { getCurrentCoords, type Coords } from "@/lib/geo";
+import type { ApiLocation, Category, User } from "@/lib/types";
 import styles from "./log.module.css";
 
-type Coords = { lat: number; lng: number };
 type CaptureStatus = "idle" | "locating" | "error";
 
 export default function LogLocationPage() {
+  const router = useRouter();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [recent, setRecent] = useState<ApiLocation[]>([]);
+  const [loadError, setLoadError] = useState("");
+
   const [name, setName] = useState("");
-  const [type, setType] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [coords, setCoords] = useState<Coords | null>(null);
   const [status, setStatus] = useState<CaptureStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  const [recent, setRecent] = useState<LoggedLocation[]>(SAMPLE_RECENT);
 
-  function confirmLocation() {
-    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setStatus("error");
-      setErrorMsg("Geolocation is not supported by this browser.");
-      return;
-    }
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  const [editing, setEditing] = useState<ApiLocation | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const me = await getMe();
+      if (!active) return;
+      if (!me.ok) {
+        router.replace("/");
+        return;
+      }
+      setUser(me.data);
+
+      const [cats, locs] = await Promise.all([getCategories(), getLocations()]);
+      if (!active) return;
+      if (cats.ok) setCategories(cats.data);
+      if (locs.ok) setRecent(locs.data);
+      if (!cats.ok || !locs.ok) {
+        setLoadError("Couldn't load some data. Please refresh.");
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [router]);
+
+  async function confirmLocation() {
     setStatus("locating");
     setErrorMsg("");
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setStatus("idle");
-      },
-      (err) => {
-        setStatus("error");
-        setErrorMsg(
-          err.code === err.PERMISSION_DENIED
-            ? "Location permission denied. Enable it to capture coordinates."
-            : "Could not determine your location. Please try again.",
-        );
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+    try {
+      setCoords(await getCurrentCoords());
+      setStatus("idle");
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Could not get location.");
+    }
+  }
+
+  const canSave =
+    name.trim() !== "" && categoryId !== "" && coords !== null && !saving;
+
+  async function handleSave() {
+    if (!canSave || !coords) return;
+    setSaving(true);
+    setSaveError("");
+    const res = await createLocation({
+      name: name.trim(),
+      category_id: Number(categoryId),
+      lat: coords.lat,
+      lng: coords.lng,
+    });
+    setSaving(false);
+    if (res.ok) {
+      setRecent((prev) => [res.data, ...prev]);
+      setName("");
+      setCategoryId("");
+      setCoords(null);
+      setStatus("idle");
+    } else {
+      const fields = res.fieldErrors ? Object.values(res.fieldErrors) : [];
+      setSaveError(fields.length ? fields.join(" ") : res.error);
+    }
+  }
+
+  if (!user) {
+    return (
+      <div className={styles.screen}>
+        <main
+          className={styles.body}
+          style={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <span className={styles.formSub}>Loading…</span>
+        </main>
+      </div>
     );
   }
 
-  const canSave = name.trim() !== "" && type !== "" && coords !== null;
-
-  function handleSave() {
-    if (!canSave || !coords) return;
-    const entry: LoggedLocation = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
-      lat: coords.lat,
-      lng: coords.lng,
-      type: type as BuildingType,
-    };
-    // Payload that a real backend would receive: { name, type, lat, lng }
-    setRecent((prev) => [entry, ...prev]);
-    setName("");
-    setType("");
-    setCoords(null);
-    setStatus("idle");
-  }
+  const categoryOptions = categories.map((c) => ({
+    value: String(c.id),
+    label: c.name,
+  }));
 
   return (
     <div className={styles.screen}>
-      <Topbar />
+      <Topbar email={user.email} />
 
       <main className={styles.body}>
         <section className={styles.formCard}>
@@ -82,21 +131,21 @@ export default function LogLocationPage() {
 
           <TextField
             label="Name of location"
-            placeholder="e.g. Central Mosque, Ikeja"
+            placeholder="e.g. Central Park"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
           <div>
             <Dropdown
-              label="Building type"
-              placeholder="Select building type"
-              value={type}
-              onChange={setType}
-              options={BUILDING_TYPES}
+              label="Category"
+              placeholder="Select category"
+              value={categoryId}
+              onChange={setCategoryId}
+              options={categoryOptions}
             />
             <p className={styles.typeHelp} style={{ marginTop: 7 }}>
-              Residential · Government · Commercial · Schools · Religious · Healthcare
+              Choose the category that best fits this place.
             </p>
           </div>
 
@@ -122,8 +171,9 @@ export default function LogLocationPage() {
           </div>
 
           <Button icon={Check} fullWidth onClick={handleSave} disabled={!canSave}>
-            Save location
+            {saving ? "Saving…" : "Save location"}
           </Button>
+          {saveError && <span className={styles.error}>{saveError}</span>}
         </section>
 
         <section className={styles.recentPanel}>
@@ -131,13 +181,34 @@ export default function LogLocationPage() {
             <h2 className={styles.recentTitle}>Recent locations</h2>
             <span className={styles.count}>{recent.length}</span>
           </div>
+          {loadError && <span className={styles.error}>{loadError}</span>}
           <div className={styles.recentList}>
             {recent.map((loc) => (
-              <RecentRow key={loc.id} location={loc} />
+              <RecentRow
+                key={loc.id}
+                location={loc}
+                onClick={() => setEditing(loc)}
+              />
             ))}
           </div>
         </section>
       </main>
+
+      {editing && (
+        <LocationModal
+          location={editing}
+          categories={categories}
+          onClose={() => setEditing(null)}
+          onUpdated={(updated) =>
+            setRecent((prev) =>
+              prev.map((l) => (l.id === updated.id ? updated : l)),
+            )
+          }
+          onDeleted={(id) =>
+            setRecent((prev) => prev.filter((l) => l.id !== id))
+          }
+        />
+      )}
     </div>
   );
 }

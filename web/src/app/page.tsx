@@ -7,18 +7,27 @@ import { Brand } from "@/components/Brand";
 import { Button } from "@/components/Button";
 import { TextField } from "@/components/TextField";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { login } from "@/lib/api";
 import styles from "./login.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    // Demo only: no real authentication. A production app would verify
-    // credentials server-side and set an httpOnly session cookie.
-    router.push("/log");
+    setError("");
+    setSubmitting(true);
+    const res = await login(email, password);
+    setSubmitting(false);
+    if (res.ok) {
+      router.push("/log");
+    } else {
+      setError(res.error);
+    }
   }
 
   return (
@@ -57,16 +66,11 @@ export default function LoginPage() {
             required
           />
 
-          <Button type="submit" icon={ArrowRight} fullWidth>
-            Sign in
-          </Button>
+          {error && <p className={styles.error}>{error}</p>}
 
-          <div className={styles.footer}>
-            <span className={styles.footMuted}>No account?</span>
-            <a className={styles.footLink} href="#">
-              Request access
-            </a>
-          </div>
+          <Button type="submit" icon={ArrowRight} fullWidth disabled={submitting}>
+            {submitting ? "Signing in…" : "Sign in"}
+          </Button>
         </form>
 
         <aside className={styles.accentSide}>

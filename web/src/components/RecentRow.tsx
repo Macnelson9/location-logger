@@ -1,11 +1,17 @@
 import { MapPin } from "lucide-react";
-import type { LoggedLocation } from "@/lib/recent";
+import type { ApiLocation } from "@/lib/types";
 import { formatCoords } from "@/lib/recent";
 import styles from "./RecentRow.module.css";
 
-export function RecentRow({ location }: { location: LoggedLocation }) {
+export function RecentRow({
+  location,
+  onClick,
+}: {
+  location: ApiLocation;
+  onClick?: () => void;
+}) {
   return (
-    <div className={styles.row}>
+    <button type="button" className={styles.row} onClick={onClick}>
       <span className={styles.pin}>
         <MapPin size={21} strokeWidth={2} />
       </span>
@@ -15,7 +21,7 @@ export function RecentRow({ location }: { location: LoggedLocation }) {
           {formatCoords(location.lat, location.lng)}
         </span>
       </div>
-      <span className={styles.badge}>{location.type}</span>
-    </div>
+      <span className={styles.badge}>{location.category}</span>
+    </button>
   );
 }

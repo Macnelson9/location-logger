@@ -4,11 +4,17 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Brand } from "./Brand";
 import { ThemeToggle } from "./ThemeToggle";
+import { logout } from "@/lib/api";
 import styles from "./Topbar.module.css";
 
-export function Topbar({ email = "michaelofatu@gmail.com" }: { email?: string }) {
+export function Topbar({ email }: { email: string }) {
   const router = useRouter();
   const initials = email.slice(0, 2).toUpperCase();
+
+  async function handleLogout() {
+    await logout();
+    router.push("/");
+  }
 
   return (
     <header className={styles.bar}>
@@ -23,7 +29,7 @@ export function Topbar({ email = "michaelofatu@gmail.com" }: { email?: string })
           type="button"
           className={styles.logout}
           aria-label="Sign out"
-          onClick={() => router.push("/")}
+          onClick={handleLogout}
         >
           <LogOut size={16} strokeWidth={2} />
         </button>
