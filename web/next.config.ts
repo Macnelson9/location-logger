@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  // Proxy API calls to the backend so the browser only ever talks to its own
+  // origin: the session cookie stays first-party, there's no CORS, and the
+  // strict `connect-src 'self'` CSP in middleware.ts keeps holding.
+  async rewrites() {
+    const target = process.env.API_PROXY_TARGET ?? "http://localhost:5001";
+    return [{ source: "/api/:path*", destination: `${target}/api/:path*` }];
+  },
 };
 
 export default nextConfig;

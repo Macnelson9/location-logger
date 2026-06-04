@@ -2,12 +2,14 @@ import { useId } from "react";
 import { ChevronDown } from "lucide-react";
 import styles from "./Field.module.css";
 
+type Option = string | { value: string; label: string };
+
 interface DropdownProps {
   label: string;
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
-  options: readonly string[];
+  options: readonly Option[];
   id?: string;
 }
 
@@ -22,6 +24,9 @@ export function Dropdown({
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   const isPlaceholder = value === "";
+  const normalized = options.map((opt) =>
+    typeof opt === "string" ? { value: opt, label: opt } : opt,
+  );
 
   return (
     <div className={styles.field}>
@@ -38,9 +43,9 @@ export function Dropdown({
           <option value="" disabled>
             {placeholder}
           </option>
-          {options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
+          {normalized.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
             </option>
           ))}
         </select>

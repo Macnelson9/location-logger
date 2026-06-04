@@ -54,20 +54,11 @@
   color: var(--text-muted);
 }
 
-.footer {
-  display: flex;
-  justify-content: center;
-  gap: 5px;
+.error {
+  font-family: var(--font-body);
   font-size: 13px;
-}
-
-.footMuted {
-  color: var(--text-muted);
-}
-
-.footLink {
-  color: var(--accent);
-  font-weight: 600;
+  line-height: 1.4;
+  color: var(--danger);
 }
 
 .accentSide {
@@ -146,8 +137,16 @@
 }
 
 @media (max-width: 480px) {
+  /* The card grows to nearly full width here, so a vertically-centered card
+     can collide with the corner toggle. Top-align it and reserve a strip up
+     top for the toggle to sit clear. */
   .screen {
-    padding: 20px;
+    align-items: flex-start;
+    padding: 76px 20px 24px;
+  }
+  .toggleWrap {
+    top: 16px;
+    right: 16px;
   }
   .formSide {
     padding: 32px 28px 28px;
