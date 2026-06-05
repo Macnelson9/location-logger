@@ -22,6 +22,16 @@
   outline-offset: 2px;
 }
 
+/* Read-only variant: no hover affordance, not clickable. */
+.static {
+  cursor: default;
+}
+
+.static:hover {
+  border-color: var(--border);
+  box-shadow: none;
+}
+
 .pin {
   display: inline-flex;
   align-items: center;

@@ -10,8 +10,8 @@ export function RecentRow({
   location: ApiLocation;
   onClick?: () => void;
 }) {
-  return (
-    <button type="button" className={styles.row} onClick={onClick}>
+  const inner = (
+    <>
       <span className={styles.pin}>
         <MapPin size={21} strokeWidth={2} />
       </span>
@@ -22,6 +22,18 @@ export function RecentRow({
         </span>
       </div>
       <span className={styles.badge}>{location.category}</span>
+    </>
+  );
+
+  // Read-only rows (e.g. the Browse page) get a non-interactive container so
+  // they aren't misleadingly clickable.
+  if (!onClick) {
+    return <div className={`${styles.row} ${styles.static}`}>{inner}</div>;
+  }
+
+  return (
+    <button type="button" className={styles.row} onClick={onClick}>
+      {inner}
     </button>
   );
 }

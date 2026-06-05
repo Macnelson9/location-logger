@@ -59,6 +59,7 @@ export default function LoginPage() {
           <TextField
             label="Password"
             type="password"
+            revealable
             autoComplete="current-password"
             placeholder="••••••••••"
             value={password}

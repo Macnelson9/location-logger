@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { Inter, Newsreader } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,6 +21,16 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "LocationLog",
   description: "Log field locations in seconds.",
+  applicationName: "LocationLog",
+  appleWebApp: {
+    capable: true,
+    title: "LocationLog",
+    statusBarStyle: "default",
+  },
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -40,6 +51,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${newsreader.variable}`}>
         <ThemeProvider nonce={nonce}>{children}</ThemeProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

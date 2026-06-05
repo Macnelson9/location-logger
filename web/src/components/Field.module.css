@@ -69,3 +69,27 @@
   flex-shrink: 0;
   pointer-events: none;
 }
+
+/* Interactive in-field control, e.g. the password reveal toggle. */
+.adornment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.adornment:hover {
+  color: var(--text-2);
+}
+
+.adornment:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
