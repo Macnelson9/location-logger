@@ -8,6 +8,37 @@
   border-bottom: 1px solid var(--border);
 }
 
+.left {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navLink {
+  padding: 7px 14px;
+  border-radius: 100px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navLink:hover {
+  background: var(--surface-alt);
+}
+
+.navLinkActive {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
 .right {
   display: flex;
   align-items: center;

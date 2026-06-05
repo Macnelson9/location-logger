@@ -69,6 +69,11 @@ export function getLocations(): Promise<ApiResult<ApiLocation[]>> {
   return request<ApiLocation[]>("/locations");
 }
 
+/** All locations from every user. Public — no auth required. */
+export function getMapLocations(): Promise<ApiResult<ApiLocation[]>> {
+  return request<ApiLocation[]>("/locations/map");
+}
+
 export interface NewLocation {
   name: string;
   category_id: number;
