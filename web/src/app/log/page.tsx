@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { LocateFixed, Check } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
@@ -8,12 +9,28 @@ import { Button } from "@/components/Button";
 import { TextField } from "@/components/TextField";
 import { Dropdown } from "@/components/Dropdown";
 import { CoordChip } from "@/components/CoordChip";
-import { RecentRow } from "@/components/RecentRow";
-import { LocationModal } from "@/components/LocationModal";
-import { createLocation, getCategories, getLocations, getMe } from "@/lib/api";
+import { createLocation, getCategories, getMe } from "@/lib/api";
 import { getCurrentCoords, type Coords } from "@/lib/geo";
-import type { ApiLocation, Category, User } from "@/lib/types";
+import type { Category, User } from "@/lib/types";
 import styles from "./log.module.css";
+
+// Leaflet touches `window`, so the map is client-only.
+const LocationMap = dynamic(
+  () => import("@/components/LocationMap").then((m) => m.LocationMap),
+  {
+    ssr: false,
+    loading: () => <div className={styles.mapLoading}>Loading map…</div>,
+  },
+);
+// `dynamic()` wraps the component in an unsized div, breaking `height: 100%`
+// on the map canvas. This thin wrapper restores the full-height chain.
+function MapPanel({ coords }: { coords: Coords | null }) {
+  return (
+    <div style={{ height: "100%", width: "100%" }}>
+      <LocationMap coords={coords} />
+    </div>
+  );
+}
 
 type CaptureStatus = "idle" | "locating" | "error";
 
@@ -22,7 +39,6 @@ export default function LogLocationPage() {
 
   const [user, setUser] = useState<User | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [recent, setRecent] = useState<ApiLocation[]>([]);
   const [loadError, setLoadError] = useState("");
 
   const [name, setName] = useState("");
@@ -33,8 +49,6 @@ export default function LogLocationPage() {
 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
-
-  const [editing, setEditing] = useState<ApiLocation | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -47,13 +61,10 @@ export default function LogLocationPage() {
       }
       setUser(me.data);
 
-      const [cats, locs] = await Promise.all([getCategories(), getLocations()]);
+      const cats = await getCategories();
       if (!active) return;
       if (cats.ok) setCategories(cats.data);
-      if (locs.ok) setRecent(locs.data);
-      if (!cats.ok || !locs.ok) {
-        setLoadError("Couldn't load some data. Please refresh.");
-      }
+      else setLoadError("Couldn't load categories. Please refresh.");
     })();
     return () => {
       active = false;
@@ -87,7 +98,6 @@ export default function LogLocationPage() {
     });
     setSaving(false);
     if (res.ok) {
-      setRecent((prev) => [res.data, ...prev]);
       setName("");
       setCategoryId("");
       setCoords(null);
@@ -127,6 +137,7 @@ export default function LogLocationPage() {
             <p className={styles.formSub}>
               Name it, classify it, and capture the coordinates.
             </p>
+            {loadError && <span className={styles.error}>{loadError}</span>}
           </div>
 
           <TextField
@@ -176,39 +187,10 @@ export default function LogLocationPage() {
           {saveError && <span className={styles.error}>{saveError}</span>}
         </section>
 
-        <section className={styles.recentPanel}>
-          <div className={styles.recentHead}>
-            <h2 className={styles.recentTitle}>Recent locations</h2>
-            <span className={styles.count}>{recent.length}</span>
-          </div>
-          {loadError && <span className={styles.error}>{loadError}</span>}
-          <div className={styles.recentList}>
-            {recent.map((loc) => (
-              <RecentRow
-                key={loc.id}
-                location={loc}
-                onClick={() => setEditing(loc)}
-              />
-            ))}
-          </div>
+        <section className={styles.mapPanel}>
+          <MapPanel coords={coords} />
         </section>
       </main>
-
-      {editing && (
-        <LocationModal
-          location={editing}
-          categories={categories}
-          onClose={() => setEditing(null)}
-          onUpdated={(updated) =>
-            setRecent((prev) =>
-              prev.map((l) => (l.id === updated.id ? updated : l)),
-            )
-          }
-          onDeleted={(id) =>
-            setRecent((prev) => prev.filter((l) => l.id !== id))
-          }
-        />
-      )}
     </div>
   );
 }

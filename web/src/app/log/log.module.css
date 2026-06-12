@@ -71,44 +71,27 @@
   color: var(--danger);
 }
 
-.recentPanel {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+.mapPanel {
   flex: 1;
   min-width: 0;
+  align-self: stretch;
+  height: calc(100vh - 72px - 72px);
+  min-height: 480px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
 }
 
-.recentHead {
+.mapLoading {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.recentTitle {
-  font-family: var(--font-head);
-  font-size: 21px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.count {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 11px;
-  background: var(--accent-soft);
-  border-radius: 100px;
+  height: 100%;
   font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.recentList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+  background: var(--surface);
 }
 
 @media (max-width: 900px) {
@@ -118,8 +101,10 @@
   .formCard {
     width: 100%;
   }
-  .recentPanel {
+  .mapPanel {
     width: 100%;
+    height: 60vh;
+    min-height: 360px;
   }
 }
 
