@@ -10,6 +10,7 @@ import styles from "./Topbar.module.css";
 
 const NAV_LINKS = [
   { href: "/log", label: "Log" },
+  { href: "/recents", label: "Recents" },
   { href: "/browse", label: "Browse" },
 ];
 

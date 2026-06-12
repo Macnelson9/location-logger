@@ -19,7 +19,8 @@ export function middleware(request: NextRequest) {
 
   const csp = [
     "default-src 'self'",
-    "img-src 'self' data:",
+    // OpenStreetMap raster tiles load as <img>; allow that one host only.
+    "img-src 'self' data: https://*.tile.openstreetmap.org",
     // next/font injects an inline <style>; allow inline styles.
     "style-src 'self' 'unsafe-inline'",
     `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""}`,

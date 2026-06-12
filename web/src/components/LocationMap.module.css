@@ -1,0 +1,24 @@
+.map {
+  height: 100%;
+  width: 100%;
+  background: var(--surface-2, var(--surface));
+}
+
+/* The map tiles render under the app's strict surface; keep Leaflet's chrome
+   on-brand rather than its default blue links / white controls. */
+.map :global(.leaflet-control-attribution) {
+  background: rgba(255, 255, 255, 0.75);
+  font-family: var(--font-body);
+  font-size: 10px;
+}
+
+.map :global(.leaflet-control-attribution a) {
+  color: var(--accent);
+}
+
+/* divIcon ships with a white background + border by default; strip it so only
+   our SVG pin shows. */
+.pinWrap {
+  background: transparent;
+  border: none;
+}
