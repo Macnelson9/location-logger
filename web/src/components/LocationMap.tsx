@@ -52,12 +52,16 @@ export function LocationMap({ coords }: { coords: Coords | null }) {
 
     mapRef.current = map;
 
+    // Invalidate after first paint so Leaflet measures the real container size.
+    const raf = requestAnimationFrame(() => map.invalidateSize());
+
     // The map mounts inside a flex column; its size isn't final on first paint.
     const resize = () => map.invalidateSize();
     const observer = new ResizeObserver(resize);
     observer.observe(containerRef.current);
 
     return () => {
+      cancelAnimationFrame(raf);
       observer.disconnect();
       map.remove();
       mapRef.current = null;

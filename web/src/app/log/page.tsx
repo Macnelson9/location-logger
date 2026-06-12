@@ -9,7 +9,7 @@ import { Button } from "@/components/Button";
 import { TextField } from "@/components/TextField";
 import { Dropdown } from "@/components/Dropdown";
 import { CoordChip } from "@/components/CoordChip";
-import { createLocation, getCategories, getMe } from "@/lib/api";
+import { createLocation, getCategories, getLocations, getMe } from "@/lib/api";
 import { getCurrentCoords, type Coords } from "@/lib/geo";
 import type { Category, User } from "@/lib/types";
 import styles from "./log.module.css";

@@ -6,14 +6,14 @@ the map service we're building with clean, structured location data.
 
 ## What it does
 
-- **Log a location** — name it, pick a building type (Residential, Government,
-  Commercial, Schools, Religious, Healthcare), and capture live coordinates from
-  the browser's geolocation.
-- **Recent locations** — see everything you've logged this session at a glance.
+- **Log a location** — name it, pick a category (Restaurant, Cafe, Park, Museum,
+  Hotel, Hospital, School, Shopping Mall, Gas Station, Parking Lot — served by
+  the API), and capture live coordinates from the browser's geolocation.
+- **Recent locations** — see every location you've saved, loaded from the API.
 - **Light & dark themes** — toggle to match your environment.
 
-> Sign-in is demo-only for now (no real auth) — any valid email + any password
-> takes you to the logger. Real credential checks belong on the backend.
+> Sign-in uses real session-based auth against the backend API. The session
+> cookie is set on login and cleared on logout.
 
 ## Tech stack
 
@@ -29,8 +29,14 @@ npm install
 npm run dev     # http://localhost:3000
 ```
 
+The frontend talks to the **Goyin Locations API**, expected at
+`http://localhost:5001` — start it before signing in. Calls to `/api/*` are
+proxied there (see `next.config.ts`), so the browser stays same-origin (the
+session cookie is first-party and the strict CSP holds). Point at a different
+backend with the `API_PROXY_TARGET` env var.
+
 Other scripts: `npm run build` (production build), `npm run start` (serve the
-build), `npm run lint`.
+build).
 
 ## Project layout
 
@@ -38,7 +44,7 @@ build), `npm run lint`.
 web/src/
   app/            # routes: / (login), /log (logger)
   components/     # reusable UI: Button, TextField, Dropdown, CoordChip, …
-  lib/            # building types, sample data
+  lib/            # api.ts (API client), types.ts, coord formatting
   middleware.ts   # nonce-based Content-Security-Policy
 ```
 

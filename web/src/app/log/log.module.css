@@ -83,6 +83,14 @@
   box-shadow: var(--shadow-card);
 }
 
+/* Ensure every wrapper div injected by next/dynamic fills the panel */
+.mapPanel > div,
+.mapPanel > div > div,
+.mapPanel > div > div > div {
+  height: 100%;
+  width: 100%;
+}
+
 .mapLoading {
   display: flex;
   align-items: center;
@@ -97,14 +105,20 @@
 @media (max-width: 900px) {
   .body {
     flex-direction: column;
+    align-items: stretch;
   }
   .formCard {
     width: 100%;
+    order: 2;
   }
   .mapPanel {
+    /* In the column layout the flex main axis is vertical, so the base rule's
+       `flex: 1` (basis 0%) would override `height` and collapse the panel. */
+    flex: none;
     width: 100%;
-    height: 60vh;
-    min-height: 360px;
+    height: 340px;
+    min-height: 0;
+    order: 1;
   }
 }
 
