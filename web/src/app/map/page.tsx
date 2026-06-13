@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Topbar } from "@/components/Topbar";
-import { getLocations, getMe } from "@/lib/api";
+import { getMapLocations, getMe } from "@/lib/api";
 import type { ApiLocation, User } from "@/lib/types";
 import styles from "./map.module.css";
 
@@ -54,7 +54,7 @@ function MapView() {
       }
       setUser(me.data);
 
-      const locs = await getLocations();
+      const locs = await getMapLocations();
       if (!active) return;
       if (locs.ok) setLocations(locs.data);
       else setLoadError("Couldn't load the map. Please refresh.");
