@@ -22,8 +22,8 @@
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06), 0 12px 28px rgba(0, 0, 0, 0.1);
   --shadow-card-lg: 0 2px 8px rgba(0, 0, 0, 0.06), 0 14px 32px rgba(0, 0, 0, 0.1);
 
-  --font-head: var(--font-newsreader), Georgia, "Times New Roman", serif;
-  --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-head: "Newsreader", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
 }
 
 [data-theme="dark"] {
