@@ -87,8 +87,8 @@ export default function BrowsePage() {
         <div className={styles.head}>
           <h1 className={styles.title}>Browse locations</h1>
           <p className={styles.sub}>
-            Every place logged so far. Check here before logging to avoid
-            duplicates.
+            Every place logged so far. Tap a location to see it on the map, or
+            check here before logging to avoid duplicates.
           </p>
         </div>
 
@@ -137,7 +137,11 @@ export default function BrowsePage() {
         ) : (
           <div className={styles.list}>
             {visible.map((loc) => (
-              <RecentRow key={loc.id} location={loc} />
+              <RecentRow
+                key={loc.id}
+                location={loc}
+                onOpen={() => router.push(`/map?focus=${loc.id}`)}
+              />
             ))}
           </div>
         )}

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Coords } from "@/lib/geo";
+import type { ApiLocation } from "@/lib/types";
 import styles from "./LocationMap.module.css";
 
 // A neutral starting view until the user captures a point.
@@ -25,19 +26,59 @@ const pinIcon = L.divIcon({
   iconAnchor: [17, 32],
 });
 
+// Escape user-supplied text before it goes into a popup's HTML string.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// Popup markup for a saved location: name, then lat / lng.
+function locationPopup(loc: ApiLocation): string {
+  return `
+    <div class="${styles.popup}">
+      <strong class="${styles.popupName}">${escapeHtml(loc.name)}</strong>
+      <span class="${styles.popupCoord}">Lat ${loc.lat.toFixed(5)}</span>
+      <span class="${styles.popupCoord}">Lng ${loc.lng.toFixed(5)}</span>
+    </div>`;
+}
+
 /**
  * Interactive Leaflet map. Client-only (touches `window`); load it via a
- * `dynamic(..., { ssr: false })` import. When `coords` is set, the map flies to
- * the point and drops a pin, giving the user a visual of what they captured.
+ * `dynamic(..., { ssr: false })` import.
+ *
+ * - `coords` (used on /log): flies to a single just-captured point and drops a
+ *   pin, giving the user a visual of what they captured.
+ * - `locations` (used on /map): renders one pin per saved location, each with a
+ *   popup showing its name and coordinates.
+ * - `focusId`: when set, flies to that location's pin and opens its popup.
  */
-export function LocationMap({ coords }: { coords: Coords | null }) {
+export function LocationMap({
+  coords,
+  locations,
+  focusId,
+}: {
+  coords?: Coords | null;
+  locations?: ApiLocation[];
+  focusId?: number | null;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  // Pins for saved locations, keyed by location id so `focusId` can find them.
+  const locationMarkersRef = useRef<Map<number, L.Marker>>(new Map());
 
   // Initialise the map once.
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
+
+    // React StrictMode unmounts/remounts effects; Leaflet leaves a _leaflet_id
+    // on the container after map.remove(), which causes "already initialized"
+    // on the second mount. Clear it before re-initialising.
+    const container = containerRef.current as HTMLDivElement & { _leaflet_id?: number };
+    delete container._leaflet_id;
 
     const map = L.map(containerRef.current, {
       center: DEFAULT_CENTER,
@@ -66,8 +107,38 @@ export function LocationMap({ coords }: { coords: Coords | null }) {
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
+      locationMarkersRef.current.clear();
     };
   }, []);
+
+  // Render a pin per saved location, re-syncing whenever the set changes.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !locations) return;
+
+    const markers = locationMarkersRef.current;
+    for (const marker of markers.values()) marker.remove();
+    markers.clear();
+
+    for (const loc of locations) {
+      const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon })
+        .addTo(map)
+        .bindPopup(locationPopup(loc));
+      markers.set(loc.id, marker);
+    }
+  }, [locations]);
+
+  // Fly to a specific location's pin and open its popup.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || focusId == null) return;
+
+    const marker = locationMarkersRef.current.get(focusId);
+    if (!marker) return;
+
+    map.flyTo(marker.getLatLng(), FOCUS_ZOOM, { duration: 1.1 });
+    marker.openPopup();
+  }, [focusId, locations]);
 
   // Fly to / drop the pin whenever coordinates change.
   useEffect(() => {
