@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
+import { useState } from "react";
 import { Brand } from "./Brand";
 import { ThemeToggle } from "./ThemeToggle";
 import { logout } from "@/lib/api";
@@ -10,6 +11,7 @@ import styles from "./Topbar.module.css";
 
 const NAV_LINKS = [
   { href: "/log", label: "Log" },
+  { href: "/map", label: "Map" },
   { href: "/recents", label: "Recents" },
   { href: "/browse", label: "Browse" },
 ];
@@ -18,6 +20,7 @@ export function Topbar({ email }: { email: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const initials = email.slice(0, 2).toUpperCase();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   async function handleLogout() {
     await logout();
@@ -57,7 +60,42 @@ export function Topbar({ email }: { email: string }) {
         >
           <LogOut size={16} strokeWidth={2} />
         </button>
+        <button
+          type="button"
+          className={styles.hamburger}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          {menuOpen ? <X size={20} strokeWidth={2} /> : <Menu size={20} strokeWidth={2} />}
+        </button>
       </div>
+
+      {menuOpen && (
+        <nav className={styles.mobileMenu}>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`${styles.mobileLink} ${
+                pathname === link.href ? styles.mobileLinkActive : ""
+              }`}
+              aria-current={pathname === link.href ? "page" : undefined}
+              onClick={() => setMenuOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <button
+            type="button"
+            className={styles.mobileLogout}
+            onClick={handleLogout}
+          >
+            <LogOut size={15} strokeWidth={2} />
+            Sign out
+          </button>
+        </nav>
+      )}
     </header>
   );
 }

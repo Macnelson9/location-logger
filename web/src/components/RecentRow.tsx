@@ -1,16 +1,20 @@
-import { MapPin } from "lucide-react";
+import { MapPin, Pencil } from "lucide-react";
 import type { ApiLocation } from "@/lib/types";
 import { formatCoords } from "@/lib/recent";
 import styles from "./RecentRow.module.css";
 
 export function RecentRow({
   location,
-  onClick,
+  onOpen,
+  onEdit,
 }: {
   location: ApiLocation;
-  onClick?: () => void;
+  /** Primary action: open this location (e.g. show it on the map). */
+  onOpen?: () => void;
+  /** Secondary action: open the edit/delete modal. Renders a pencil button. */
+  onEdit?: () => void;
 }) {
-  const inner = (
+  const content = (
     <>
       <span className={styles.pin}>
         <MapPin size={21} strokeWidth={2} />
@@ -20,6 +24,7 @@ export function RecentRow({
         <span className={styles.coords}>
           {formatCoords(location.lat, location.lng)}
         </span>
+        <span className={styles.coordsMobile}>{location.category}</span>
       </div>
       <span className={styles.badge}>{location.category}</span>
     </>
@@ -27,13 +32,25 @@ export function RecentRow({
 
   // Read-only rows (e.g. the Browse page) get a non-interactive container so
   // they aren't misleadingly clickable.
-  if (!onClick) {
-    return <div className={`${styles.row} ${styles.static}`}>{inner}</div>;
+  if (!onOpen) {
+    return <div className={`${styles.row} ${styles.static}`}>{content}</div>;
   }
 
   return (
-    <button type="button" className={styles.row} onClick={onClick}>
-      {inner}
-    </button>
+    <div className={styles.row}>
+      <button type="button" className={styles.main} onClick={onOpen}>
+        {content}
+      </button>
+      {onEdit && (
+        <button
+          type="button"
+          className={styles.edit}
+          aria-label={`Edit ${location.name}`}
+          onClick={onEdit}
+        >
+          <Pencil size={17} strokeWidth={2} />
+        </button>
+      )}
+    </div>
   );
 }

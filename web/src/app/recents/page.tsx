@@ -63,7 +63,8 @@ export default function RecentsPage() {
         <div className={styles.head}>
           <h1 className={styles.title}>Recent locations</h1>
           <p className={styles.sub}>
-            Everything you&rsquo;ve logged. Tap a place to edit or remove it.
+            Everything you&rsquo;ve logged. Tap a place to see it on the map, or
+            use the pencil to edit or remove it.
           </p>
         </div>
 
@@ -86,7 +87,8 @@ export default function RecentsPage() {
               <RecentRow
                 key={loc.id}
                 location={loc}
-                onClick={() => setEditing(loc)}
+                onOpen={() => router.push(`/map?focus=${loc.id}`)}
+                onEdit={() => setEditing(loc)}
               />
             ))}
           </div>

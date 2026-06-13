@@ -11,7 +11,7 @@ import { Dropdown } from "@/components/Dropdown";
 import { CoordChip } from "@/components/CoordChip";
 import { createLocation, getCategories, getLocations, getMe } from "@/lib/api";
 import { getCurrentCoords, type Coords } from "@/lib/geo";
-import type { Category, User } from "@/lib/types";
+import type { ApiLocation, Category, User } from "@/lib/types";
 import styles from "./log.module.css";
 
 // Leaflet touches `window`, so the map is client-only.
@@ -24,10 +24,10 @@ const LocationMap = dynamic(
 );
 // `dynamic()` wraps the component in an unsized div, breaking `height: 100%`
 // on the map canvas. This thin wrapper restores the full-height chain.
-function MapPanel({ coords }: { coords: Coords | null }) {
+function MapPanel({ coords, locations }: { coords: Coords | null; locations: ApiLocation[] }) {
   return (
     <div style={{ height: "100%", width: "100%" }}>
-      <LocationMap coords={coords} />
+      <LocationMap coords={coords} locations={locations} />
     </div>
   );
 }
@@ -39,6 +39,7 @@ export default function LogLocationPage() {
 
   const [user, setUser] = useState<User | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<ApiLocation[]>([]);
   const [loadError, setLoadError] = useState("");
 
   const [name, setName] = useState("");
@@ -65,6 +66,10 @@ export default function LogLocationPage() {
       if (!active) return;
       if (cats.ok) setCategories(cats.data);
       else setLoadError("Couldn't load categories. Please refresh.");
+
+      const locs = await getLocations();
+      if (!active) return;
+      if (locs.ok) setLocations(locs.data);
     })();
     return () => {
       active = false;
@@ -98,6 +103,7 @@ export default function LogLocationPage() {
     });
     setSaving(false);
     if (res.ok) {
+      setLocations((prev) => [...prev, res.data]);
       setName("");
       setCategoryId("");
       setCoords(null);
@@ -188,7 +194,7 @@ export default function LogLocationPage() {
         </section>
 
         <section className={styles.mapPanel}>
-          <MapPanel coords={coords} />
+          <MapPanel coords={coords} locations={locations} />
         </section>
       </main>
     </div>
